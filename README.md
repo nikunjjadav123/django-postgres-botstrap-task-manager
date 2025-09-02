@@ -1,4 +1,4 @@
-# Django PostgreSQL Bootstrap Task Manager
+# Django PostgreSQL Bootstrap Task Manager ( Basic Project )
 
 A simple **Task Manager** web application built with **Django**, **PostgreSQL**, and **Bootstrap 5**.  
 Users can add, update, and manage tasks with a clean and responsive interface.
