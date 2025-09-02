@@ -6,6 +6,7 @@
             <tr>
                 <th>#</th>
                 <th>Task Name</th>
+                <th>Task Priority</th>
                 <th>Task Status</th>
                 <th>Task Actions</th>
             </tr>
@@ -15,6 +16,9 @@
             <tr>
                 <td>{{ forloop.counter }}</td>
                 <td>{{ task.title }}</td>
+                <td>
+                    {% if task.priority == 'Low' %}  <span class="badge bg-success">Low</span> {% elif task.priority == 'Medium' %}  <span class="badge bg-primary">Medium</span> {% else %}  <span class="badge bg-danger">High</span> {% endif %}
+                </td>
                 <td>
                     {% if task.completed %}  <span class="badge bg-success">Completed</span> {% else %}  <span class="badge bg-danger">Pending</span> {% endif %}
                 </td>
