@@ -22,7 +22,6 @@ Users can add, update, and manage tasks with a clean and responsive interface.
 - ├── task_manager/       # Django project folder
 - ├── tasks/              # App for task management
 - ├── templates/          # HTML templates
-- ├── static/             # CSS/JS (Bootstrap, custom)
 - ├── .env                # Environment variables
 - ├── requirements.txt    # Python dependencies
 - └── manage.py           # Django manage script
