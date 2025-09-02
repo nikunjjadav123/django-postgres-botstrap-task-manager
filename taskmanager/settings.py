@@ -27,6 +27,9 @@ SECRET_KEY = 'django-insecure-7=tr4!uj(3watoks^+7eo0&wi7&!sp1^7%_6qs75+%f7t3j9@_
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = []
+AUTH_USER_MODEL = 'accounts.User'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Application definition
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tasks',
+    'accounts',
     'django_bootstrap5',
 ]
 
