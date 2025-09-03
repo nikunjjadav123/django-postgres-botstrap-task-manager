@@ -15,6 +15,7 @@ Users can add, update, and manage tasks with a clean and responsive interface.
 - **Frontend:** Bootstrap 5  25.2
 - **Environment Management:** python-decouple  3.8
 - **Python Version:** 3.13.5
+- **Django Crispy Forms 2.4
 
 ## Project Structure
 
