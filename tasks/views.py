@@ -1,4 +1,3 @@
-
 from .models import Task
 from .forms import TaskForm
 from django.shortcuts import render, redirect, get_object_or_404
@@ -45,3 +44,11 @@ def home(request):
 @login_required
 def dashboard(request):
     return render(request, 'tasks/dashboard.html')
+    
+@login_required
+def profile(request):
+    user = request.user
+    context = {
+        'user': user,
+    }
+    return render(request, 'tasks/profile.html', context)

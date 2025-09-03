@@ -1,33 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-    <a href="{% url 'task_create' %}" class="btn btn-success mb-3">Add Task</a>
-    <table class="table table-bordered table-hover table-striped">
-        <thead class="table-warning">
-            <tr>
-                <th>#</th>
-                <th>Task Name</th>
-                <th>Task Priority</th>
-                <th>Task Status</th>
-                <th>Task Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for task in tasks %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ task.title }}</td>
-                <td>
-                    {% if task.priority == 'Low' %}  <span class="badge bg-success">Low</span> {% elif task.priority == 'Medium' %}  <span class="badge bg-primary">Medium</span> {% else %}  <span class="badge bg-danger">High</span> {% endif %}
-                </td>
-                <td>
-                    {% if task.completed %}  <span class="badge bg-success">Completed</span> {% else %}  <span class="badge bg-danger">Pending</span> {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'task_update' task.pk %}" class="btn btn-primary btn-sm">Edit</a>
-                    <!-- <a href="{% url 'task_delete' task.pk %}" class="btn btn-danger btn-sm">Delete</a> -->
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+      <h3>My Tasks</h3>
+      <a href="{% url 'task_create' %}" class="btn btn-success mb-3">Add Task</a>
+    </div>
+
+    <div class="row g-4">
+      {% for task in tasks %}
+      <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h5 class="card-title">{{ task.title }}</h5>
+            <p class="card-text">{{ task.description|linebreaksbr }}</p>
+            <div class="mt-2">
+              <span class="badge 
+                {% if task.priority == 'High' %} bg-danger
+                {% elif task.priority == 'Medium' %} bg-primary
+                {% else %} bg-success
+                {% endif %}
+              ">{{ task.priority }}</span>
+              <span class="badge {% if task.completed %} bg-success {% else %} bg-danger {% endif %}">
+                {% if task.completed %}Completed{% else %}Pending{% endif %}
+              </span>
+            </div>
+            {% if task.due_date %}
+            <small class="text-muted d-block mt-1">Due: {{ task.due_date }}</small>
+            {% endif %}
+          </div>
+          <div class="card-footer">
+            <a href="{% url 'task_update' task.pk %}" class="btn btn-primary btn-sm">Edit Task</a>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info text-center">No tasks found.</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 {% endblock %}
