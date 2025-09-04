@@ -11,26 +11,37 @@
       <div class="col-md-4">
         <div class="card shadow-sm h-100">
           <div class="card-body">
-            <h5 class="card-title">{{ task.title }}</h5>
+            <h5 class="card-title {% if task.is_overdue %}text-danger{% endif %}">{{ task.title }}</h5>
+            {% if task.due_date %}
+              <b class="text-muted d-block mt-1">Due: {{ task.due_date|date:"F d, Y" }}</b>
+            {% endif %}
             <p class="card-text">{{ task.description|linebreaksbr }}</p>
             <div class="mt-2">
+              {% if task.completed %}
+              {% else %}
               <span class="badge 
                 {% if task.priority == 'High' %} bg-danger
                 {% elif task.priority == 'Medium' %} bg-primary
                 {% else %} bg-success
                 {% endif %}
               ">{{ task.priority }}</span>
+              {% endif %}
               <span class="badge {% if task.completed %} bg-success {% else %} bg-danger {% endif %}">
                 {% if task.completed %}Completed{% else %}Pending{% endif %}
               </span>
             </div>
-            {% if task.due_date %}
-            <small class="text-muted d-block mt-1">Due: {{ task.due_date }}</small>
-            {% endif %}
+            
           </div>
+          {% if task.completed %}
+              
+          {% else %}
           <div class="card-footer">
             <a href="{% url 'task_update' task.pk %}" class="btn btn-primary btn-sm">Edit Task</a>
+            {% if not task.completed %}
+              {% if task.is_overdue %}<span class="badge bg-danger ms-2">Overdue Task</span>{% endif %}
+            {% endif %}
           </div>
+          {% endif %}
         </div>
       </div>
       {% empty %}

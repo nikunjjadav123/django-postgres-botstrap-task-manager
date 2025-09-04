@@ -1,5 +1,8 @@
+from django.utils import timezone
+from datetime import datetime
 from django.db import models
 from accounts.models import User
+
 
 PRIORITY_CHOICES = [
     ('Low', 'Low'),
@@ -18,3 +21,10 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def is_overdue(self):
+        if self.due_date is None:
+            return False
+        due_datetime = datetime.combine(self.due_date, datetime.min.time(), tzinfo=timezone.get_current_timezone())
+        return not self.completed and due_datetime < timezone.now()

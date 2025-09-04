@@ -41,9 +41,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default is 'sessionid'; we change it for frontend users
-SESSION_COOKIE_NAME = 'frontend_session'
-SESSION_COOKIE_AGE = 1209600
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+FRONTEND_SESSION_COOKIE_NAME = "frontend_sessionid"
+FRONTEND_SESSION_COOKIE_AGE = 1209600
+FRONTEND_SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 # Application definition
 
@@ -58,8 +58,16 @@ INSTALLED_APPS = [
     'accounts',
     'django_bootstrap5',
     'crispy_forms',
-    'crispy_bootstrap5'
+    'crispy_bootstrap5',
+    'rest_framework'
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",  # JWT for frontend
+        "rest_framework.authentication.SessionAuthentication",        # Session for admin
+    ],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -83,6 +91,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'tasks.context_processors.logged_user',  # Custom context processor
             ],
         },
     },

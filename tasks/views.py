@@ -1,10 +1,66 @@
+from accounts.models import User
 from .models import Task
 from .forms import TaskForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken,TokenError,AccessToken
+from django.contrib.auth import authenticate
+from django.contrib import messages
+from django.views.decorators.csrf import csrf_exempt
 
+
+def home(request):
+    return render(request, 'tasks/home.html')
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+
+
+@csrf_exempt
+def jwt_login_page(request):
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    user = authenticate(request, username=username, password=password)
+    if user is not None and not user.is_staff:
+        tokens = get_tokens_for_user(user)
+        response = redirect("profile") # Redirect to profile page after login
+        response.set_cookie("access_token", tokens["access"], httponly=True)
+        response.set_cookie("refresh_token", tokens["refresh"], httponly=True)
+        return response
+    else:
+        # messages.error(request, "Invalid credentials or admin user.")
+        return render(request, 'tasks/login.html')
+    
+
+def jwt_logout_page(request):
+    try: 
+        response = redirect("login")
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
+        return response
+    except KeyError:
+        messages.error(request, "Refresh token required.")
+        return redirect("login")
+    except TokenError:
+        messages.error(request, "Invalid or expired token")
+        return redirect("login")
+
+@login_required(login_url='/login/')
 
 def task_list(request):
+    token = request.COOKIES.get("access_token")
+    if not token:
+        messages.error(request, "Please Login to continue.")
+        return redirect("login")
     tasks = Task.objects.all()
     return render(request, "tasks/task_list.html", {"tasks": tasks})
 
@@ -38,17 +94,23 @@ def delete_task(request, pk):
         return redirect("task_list")
     return render(request, "tasks/task_confirm_delete.html", {"task": task})
 
-def home(request):
-    return render(request, 'tasks/home.html')
-
-@login_required
 def dashboard(request):
+    token = request.COOKIES.get("access_token")
+    if not token:
+        messages.error(request, "Please Login to continue.")
+        return redirect("login")
     return render(request, 'tasks/dashboard.html')
-    
-@login_required
+
 def profile(request):
-    user = request.user
-    context = {
-        'user': user,
-    }
-    return render(request, 'tasks/profile.html', context)
+    token = request.COOKIES.get("access_token")
+    if not token:
+        messages.error(request, "Access token required.")
+        return redirect("login") 
+    try:
+        access_token = AccessToken(token)
+        user_id = access_token["user_id"]
+        user = User.objects.get(id=user_id)
+    except Exception:
+        return redirect("login")
+
+    return render(request, "tasks/profile.html", {"user": user})   

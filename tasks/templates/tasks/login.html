@@ -1,13 +1,24 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
-
+{% load static %}
 {% block content %}
 <div class="d-flex justify-content-center align-items-center vh-100">
-  <form class="p-4 border rounded shadow-sm" method="post">
-    <h3 class="mb-4 text-center">Login</h3>
+  <form class="p-4 border rounded shadow-sm" method="post" action="{% url 'login' %}" autocomplete="off">
     {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="btn btn-primary w-100">Login</button>
+    {% for message in messages %}
+    <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+    <h3 class="mb-4 text-center">Login</h3>
+    <input type="text" name="fakeusernameremembered" style="display:none">
+    <input type="password" name="fakepasswordremembered" style="display:none">
+    <div class="mb-3">
+        <label>Username:</label>
+        <input type="text" name="username" class="form-control" autocomplete="new-password">
+    </div>
+    <div class="mb-3">
+        <label>Password:</label>
+        <input type="password" name="password" class="form-control" autocomplete="new-password">
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
   </form>
 </div>
 {% endblock %}
