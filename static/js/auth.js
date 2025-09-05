@@ -6,6 +6,10 @@ const API_BASE = "http://127.0.0.1:8000";
 function saveTokens(access, refresh) {
   localStorage.setItem("access_token", access);
   localStorage.setItem("refresh_token", refresh);
+
+  document.cookie = `access_token=${access}; path=/`;
+  document.cookie = `refresh_token=${refresh}; path=/`;
+
 }
 
 // Get tokens

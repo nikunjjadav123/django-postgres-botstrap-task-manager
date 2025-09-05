@@ -80,18 +80,5 @@
     </div>
   </div>
 </footer>
-<script>
-  async function loadTasks() {
-    const res = await apiFetch("/api/tasks/");
-    if (res.ok) {
-      const tasks = await res.json();
-      console.log(tasks);
-    } else {
-      console.error("Failed to fetch tasks");
-    }
-  }
-
-  loadTasks();
-</script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+from requests import request
 from accounts.models import User
 from .models import Task
 from .forms import TaskForm
@@ -23,8 +24,13 @@ def get_tokens_for_user(user):
 
 @csrf_exempt
 def jwt_login_page(request):
-    username = request.POST.get("username")
-    password = request.POST.get("password")
+    username = request.POST.get("username") or ""
+    password = request.POST.get("password") or ""
+    if request.method == "POST":
+        if not username or not password:
+                messages.error(request, "Username and password cannot be blank.")
+                return render(request, 'tasks/login.html')
+    
     user = authenticate(request, username=username, password=password)
     if user is not None and not user.is_staff:
         tokens = get_tokens_for_user(user)
@@ -33,7 +39,8 @@ def jwt_login_page(request):
         response.set_cookie("refresh_token", tokens["refresh"], httponly=True)
         return response
     else:
-        # messages.error(request, "Invalid credentials or admin user.")
+        if request.method == "POST":
+            messages.error(request, "Invalid credentials or admin user.")
         return render(request, 'tasks/login.html')
     
 
@@ -55,7 +62,7 @@ def jwt_logout_page(request):
 def task_list(request):
     token = request.COOKIES.get("access_token")
     if not token:
-        messages.error(request, "Please Login to continue.")
+        messages.error(request, "Incorrect credentials.")
         return redirect("login")
     access_token = AccessToken(token)
     user_id = access_token["user_id"]

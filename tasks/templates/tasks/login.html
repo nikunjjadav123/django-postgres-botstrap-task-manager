@@ -1,9 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Login{% endblock %}
-
+{% load static %}
 {% block content %}
 <div class="d-flex justify-content-center align-items-center vh-100">
-  <form class="p-4 border rounded shadow-sm" method="post" id="loginForm" autocomplete="off">
+  <form class="p-4 border rounded shadow-sm" method="post" action="{% url 'login' %}" autocomplete="off">
     {% csrf_token %}
     {% for message in messages %}
     <div class="alert alert-danger">{{ message }}</div>
@@ -19,29 +18,7 @@
         <label>Password:</label>
         <input type="password" name="password" class="form-control" autocomplete="new-password">
     </div>
-    <button type="submit" class="btn btn-primary" >Login</button>
+    <button type="submit" class="btn btn-primary">Login</button>
   </form>
 </div>
 {% endblock %}
-<script>
- 
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      fetch("/api/token/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.access && data.refresh) {
-          saveTokens(data.access, data.refresh);  // ✅ Save tokens here
-          window.location.href = "/tasks/";       // Redirect to dashboard
-        } else {
-          alert("Invalid login");
-        }
-      });
-    });
-  </script>
