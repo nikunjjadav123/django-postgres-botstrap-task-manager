@@ -12,4 +12,5 @@ urlpatterns = [
     path('logout/', views.jwt_logout_page, name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
+    path("api/tasks/", views.user_tasks_json, name="tasks_json"),
 ]

@@ -1,54 +1,147 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-4">
-    <div class="d-flex justify-content-between mb-3">
-      <h3>My Tasks</h3>
-      <a href="{% url 'task_create' %}" class="btn btn-success mb-3">Add Task</a>
+  <div class="d-flex justify-content-between mb-3">
+    <h3>My Tasks</h3>
+    <!-- <a href="{% url 'task_create' %}" class="btn btn-success mb-3">Add Task</a> -->
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" id="taskTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="all-tab" data-bs-toggle="tab"
+        data-bs-target="#all" type="button" role="tab">All Tasks</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="completed-tab" data-bs-toggle="tab"
+        data-bs-target="#completed" type="button" role="tab">Completed Tasks</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="in-progress-tab" data-bs-toggle="tab"
+        data-bs-target="#in-progress" type="button" role="tab">In Progress</button>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content mt-3" id="taskTabsContent">
+
+    <!-- All Tasks -->
+    <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+      <div class="row g-4">
+        {% for task in tasks %}
+        <div class="col-md-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title {% if task.is_overdue %}text-danger{% endif %}">{{ task.title }}</h5>
+              {% if task.due_date %}
+                <b class="text-muted d-block mt-1">Due: {{ task.due_date|date:"F d, Y" }}</b>
+              {% endif %}
+              <p class="card-text">{{ task.description|linebreaksbr }}</p>
+              <div class="mt-2">
+                <span class="badge 
+                  {% if task.priority == 'High' %} bg-danger
+                  {% elif task.priority == 'Medium' %} bg-primary
+                  {% else %} bg-success
+                  {% endif %}">
+                  {{ task.priority }}
+                </span>
+                <span class="badge {% if task.completed %} bg-success {% else %} bg-danger {% endif %}">
+                  {% if task.completed %}Completed{% else %}Pending{% endif %}
+                </span>
+              </div>
+            </div>
+            {% if not task.completed %}
+            <div class="card-footer">
+              <a href="{% url 'task_update' task.pk %}" class="btn btn-primary btn-sm">Edit Task</a>
+              {% if task.is_overdue %}
+                <span class="text-danger fw-bold">❌ Overdue</span>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="alert alert-info text-center">No tasks found.</div>
+        </div>
+        {% endfor %}
+      </div>
     </div>
 
-    <div class="row g-4">
-      {% for task in tasks %}
-      <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-          <div class="card-body">
-            <h5 class="card-title {% if task.is_overdue %}text-danger{% endif %}">{{ task.title }}</h5>
-            {% if task.due_date %}
-              <b class="text-muted d-block mt-1">Due: {{ task.due_date|date:"F d, Y" }}</b>
-            {% endif %}
-            <p class="card-text">{{ task.description|linebreaksbr }}</p>
-            <div class="mt-2">
-              {% if task.completed %}
-              {% else %}
-              <span class="badge 
-                {% if task.priority == 'High' %} bg-danger
-                {% elif task.priority == 'Medium' %} bg-primary
-                {% else %} bg-success
-                {% endif %}
-              ">{{ task.priority }}</span>
+    <!-- Completed Tasks -->
+    <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+      <div class="row g-4">
+        {% for completed_task in completed_tasks %}
+        <div class="col-md-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ completed_task.title }}</h5>
+              {% if completed_task.due_date %}
+                <b class="text-muted d-block mt-1">Due: {{ completed_task.due_date|date:"F d, Y" }}</b>
               {% endif %}
-              <span class="badge {% if task.completed %} bg-success {% else %} bg-danger {% endif %}">
-                {% if task.completed %}Completed{% else %}Pending{% endif %}
-              </span>
+              <p class="card-text">{{ completed_task.description|linebreaksbr }}</p>
+              <div class="mt-2">
+                <span class="badge 
+                  {% if completed_task.priority == 'High' %} bg-danger
+                  {% elif completed_task.priority == 'Medium' %} bg-primary
+                  {% else %} bg-success
+                  {% endif %}">
+                  {{ completed_task.priority }}
+                </span>
+                <span class="badge bg-success">Completed</span>
+              </div>
             </div>
-            
-          </div>
-          {% if task.completed %}
-              
-          {% else %}
-          <div class="card-footer">
-            <a href="{% url 'task_update' task.pk %}" class="btn btn-primary btn-sm">Edit Task</a>
-            {% if not task.completed %}
-              {% if task.is_overdue %}<span class="badge bg-danger ms-2">Overdue Task</span>{% endif %}
+            {% if not completed_task.completed %}
+            <div class="card-footer">
+              <a href="{% url 'task_update' completed_task.pk %}" class="btn btn-primary btn-sm">Edit Task</a>
+            </div>
             {% endif %}
           </div>
-          {% endif %}
         </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="alert alert-info text-center">No completed tasks found.</div>
+        </div>
+        {% endfor %}
       </div>
-      {% empty %}
-      <div class="col-12">
-        <div class="alert alert-info text-center">No tasks found.</div>
-      </div>
-      {% endfor %}
     </div>
-  </div>
+
+    <!-- In Progress -->
+    <div class="tab-pane fade" id="in-progress" role="tabpanel" aria-labelledby="in-progress-tab">
+      <div class="row g-4">
+        {% for in_progress in in_progress_tasks %}
+        <div class="col-md-4">
+          <div class="card shadow-sm h-100">
+            <div class="card-body">
+              <h5 class="card-title">{{ in_progress.title }}</h5>
+              {% if in_progress.due_date %}
+                <b class="text-muted d-block mt-1">Due: {{ in_progress.due_date|date:"F d, Y" }}</b>
+              {% endif %}
+              <p class="card-text">{{ in_progress.description|linebreaksbr }}</p>
+              <div class="mt-2">
+                <span class="badge 
+                  {% if in_progress.priority == 'High' %} bg-danger
+                  {% elif in_progress.priority == 'Medium' %} bg-primary
+                  {% else %} bg-success
+                  {% endif %}">
+                  {{ in_progress.priority }}
+                </span>
+                <span class="badge bg-warning">In Progress</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a href="{% url 'task_update' in_progress.pk %}" class="btn btn-primary btn-sm">Edit Task</a>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+          <div class="alert alert-success text-center">No in-progress tasks found.</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div> <!-- End tab-content -->
+</div>
 {% endblock %}

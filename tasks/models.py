@@ -1,5 +1,5 @@
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.db import models
 from accounts.models import User
 
@@ -28,3 +28,4 @@ class Task(models.Model):
             return False
         due_datetime = datetime.combine(self.due_date, datetime.min.time(), tzinfo=timezone.get_current_timezone())
         return not self.completed and due_datetime < timezone.now()
+    

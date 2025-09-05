@@ -4,15 +4,11 @@ from .forms import TaskForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from django.conf import settings
 from rest_framework_simplejwt.tokens import RefreshToken,TokenError,AccessToken
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-
+from django.http import JsonResponse
 
 def home(request):
     return render(request, 'tasks/home.html')
@@ -54,15 +50,19 @@ def jwt_logout_page(request):
         messages.error(request, "Invalid or expired token")
         return redirect("login")
 
-@login_required(login_url='/login/')
+# @login_required(login_url='/login/')
 
 def task_list(request):
     token = request.COOKIES.get("access_token")
     if not token:
         messages.error(request, "Please Login to continue.")
         return redirect("login")
-    tasks = Task.objects.all()
-    return render(request, "tasks/task_list.html", {"tasks": tasks})
+    access_token = AccessToken(token)
+    user_id = access_token["user_id"]
+    tasks = Task.objects.filter(assigned_to=user_id)
+    completed_tasks = Task.objects.filter(completed=True,assigned_to=user_id)
+    in_progress_tasks = Task.objects.filter(completed=False,assigned_to=user_id)
+    return render(request, "tasks/task_list.html", {"tasks": tasks,"completed_tasks": completed_tasks, "in_progress_tasks": in_progress_tasks})
 
 def add_task(request):
     if request.method == "POST":
@@ -114,3 +114,15 @@ def profile(request):
         return redirect("login")
 
     return render(request, "tasks/profile.html", {"user": user})   
+
+
+## This view returns JSON response of all tasks
+def user_tasks_json(request):
+    token = request.COOKIES.get("access_token")
+    if not token:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
+
+    access_token = AccessToken(token)
+    user_id = access_token["user_id"]
+    tasks = Task.objects.filter(assigned_to=user_id).values("id", "title", "due_date", "completed")
+    return JsonResponse(list(tasks), safe=False)
