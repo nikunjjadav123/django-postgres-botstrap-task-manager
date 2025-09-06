@@ -11,7 +11,8 @@
 
             <h3 class="mb-3">{{ user.first_name }} {{ user.last_name }}</h3>
 
-            <div class="profile-info text-start px-4">
+            <div class="profile-info text-start px-4 text-center">
+                <p><strong>User Name:</strong> {{ user.username }}</p>
                 <p><strong>Email:</strong> {{ user.email }}</p>
                 <p><strong>Phone:</strong> {{ user.phone }}</p>
                 <p><strong>User Type:</strong> {{ user.get_role_display }}</p>

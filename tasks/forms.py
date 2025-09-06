@@ -1,5 +1,5 @@
 from django import forms
-from .models import Task
+from .models import Task, User
 
 class TaskForm(forms.ModelForm):
     class Meta:
@@ -19,5 +19,27 @@ class TaskForm(forms.ModelForm):
             "completed": forms.CheckboxInput(attrs={
                 "class": "form-check-input",
                 "role": "switch"
+            }),
+        }
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["username", "email","phone","profile_picture"]
+        widgets = {
+            "username": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Enter username"
+            }),
+            "email": forms.EmailInput(attrs={
+                "class": "form-control",
+                "placeholder": "Enter email"
+            }),
+            "phone": forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Enter phone number"
+            }),
+            "profile_picture": forms.ClearableFileInput(attrs={
+                "class": "form-control"
             }),
         }

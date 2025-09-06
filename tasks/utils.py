@@ -8,7 +8,7 @@ def get_logged_in_user(request):
     if not token:
         return None
     try:
-        access_token = AccessToken(token)
+        access_token = AccessToken(token) ## decodes the token into an object
         user_id = access_token["user_id"]
         return User.objects.get(id=user_id)
     except Exception:

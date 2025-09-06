@@ -1,7 +1,7 @@
 from requests import request
 from accounts.models import User
 from .models import Task
-from .forms import TaskForm
+from .forms import TaskForm, ProfileForm   
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.contrib.auth import login, logout
 
 def home(request):
     return render(request, 'tasks/home.html')
@@ -32,6 +33,7 @@ def jwt_login_page(request):
                 return render(request, 'tasks/login.html')
     
     user = authenticate(request, username=username, password=password)
+
     if user is not None and not user.is_staff:
         tokens = get_tokens_for_user(user)
         response = redirect("profile") # Redirect to profile page after login
@@ -122,6 +124,16 @@ def profile(request):
 
     return render(request, "tasks/profile.html", {"user": user})   
 
+def update_profile(request, pk):
+    user = get_object_or_404(User, pk=pk)   # fetch user by primary key
+    if request.method == "POST":
+        form = ProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return render(request, "tasks/profile.html", {"form": form, "user": user})
+    else:
+        form = ProfileForm(instance=user)
+    return render(request, "tasks/profile_form.html", {"form": form})
 
 ## This view returns JSON response of all tasks
 def user_tasks_json(request):
