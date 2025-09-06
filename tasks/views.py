@@ -5,14 +5,14 @@ from accounts.models import User
 from .models import Task
 from .forms import TaskForm, ProfileForm   
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken,TokenError,AccessToken
 from django.contrib.auth import authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from django.contrib.auth import login, logout
+from django.contrib.auth import update_session_auth_hash
+
 
 def home(request):
     return render(request, 'tasks/home.html')
@@ -61,7 +61,6 @@ def jwt_logout_page(request):
         messages.error(request, "Invalid or expired token")
         return redirect("login")
 
-# @login_required(login_url='/login/')
 
 def task_list(request):
     token = request.COOKIES.get("access_token")
@@ -133,21 +132,62 @@ def profile(request):
         access_token = AccessToken(token)
         user_id = access_token["user_id"]
         user = User.objects.get(id=user_id)
+       
     except Exception:
         return redirect("login")
 
     return render(request, "tasks/profile.html", {"user": user})   
 
 def update_profile(request, pk):
-    user = get_object_or_404(User, pk=pk)   # fetch user by primary key
+    token = request.COOKIES.get("access_token")
+    access_token = AccessToken(token)
+    user_id = access_token["user_id"]
+    user = get_object_or_404(User, pk=user_id)
+
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            return render(request, "tasks/profile.html", {"form": form, "user": user})
+            messages.success(request, "Profile updated successfully.")
+            return redirect("profile")
     else:
         form = ProfileForm(instance=user)
     return render(request, "tasks/profile_form.html", {"form": form})
+
+def change_password(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    if request.method == "POST":
+
+        token = request.COOKIES.get("access_token")
+        access_token = AccessToken(token)
+        user_id = access_token["user_id"]
+        get_user = User.objects.get(id=user_id)
+      
+        current_password = request.POST.get("current_password", "").strip()
+        new_password = request.POST.get("new_password", "").strip()
+        confirm_password = request.POST.get("confirm_password", "").strip()
+
+        user = authenticate(request, username=get_user.username, password=current_password)
+
+        if user is None:
+            messages.error(request, "Current password is incorrect.")
+            return redirect("change_password")
+
+        if new_password != confirm_password:
+            messages.error(request, "New password and confirm password do not match.")
+            return redirect("change_password")
+        
+        user.set_password(new_password)
+        user.save()
+
+        update_session_auth_hash(request, request.user)
+
+        messages.success(request, "✅ Password changed successfully!")
+        return redirect("change_password")
+
+    return render(request, "tasks/change_password.html")
 
 ## This view returns JSON response of all tasks
 def user_tasks_json(request):

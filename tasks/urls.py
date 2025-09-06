@@ -1,6 +1,7 @@
 from django.urls import path
 from django.shortcuts import redirect
 from tasks import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('tasks/', views.task_list, name='task_list'),
@@ -14,4 +15,5 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('profile/<int:pk>/edit/', views.update_profile, name='profile_update'),
     path("api/tasks/", views.user_tasks_json, name="tasks_json"),
+    path('password_change/', views.change_password, name='change_password')
 ]

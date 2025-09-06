@@ -39,11 +39,12 @@
                       </a>
                       <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
                         <li class="dropdown-item-text text-muted">
-                          Logged in as <strong>{{ user.username }}</strong>
+                          Logged in as <strong>{{ logged_user.first_name }} {{ logged_user.last_name }}</strong>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'profile' %}">View Profile</a></li>
                         <li><a class="dropdown-item" href="{% url 'profile_update' user.pk %}">Edit Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'change_password' %}">Change Password</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                           <form method="post" action="{% url 'logout' %}">
