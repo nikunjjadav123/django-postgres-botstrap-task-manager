@@ -1,3 +1,5 @@
+import calendar
+from datetime import datetime
 from requests import request
 from accounts.models import User
 from .models import Task
@@ -36,7 +38,7 @@ def jwt_login_page(request):
 
     if user is not None and not user.is_staff:
         tokens = get_tokens_for_user(user)
-        response = redirect("profile") # Redirect to profile page after login
+        response = redirect("dashboard") # Redirect to dashboard after login
         response.set_cookie("access_token", tokens["access"], httponly=True)
         response.set_cookie("refresh_token", tokens["refresh"], httponly=True)
         return response
@@ -108,7 +110,19 @@ def dashboard(request):
     if not token:
         messages.error(request, "Please Login to continue.")
         return redirect("login")
-    return render(request, 'tasks/dashboard.html')
+    try:
+        access_token = AccessToken(token)
+        user_id = access_token["user_id"]
+        user = User.objects.get(id=user_id)
+    except Exception:
+        return redirect("login")
+    
+    now = datetime.now()
+    year = now.year
+    month = now.month
+    cal = HighlightCalendar(today=now, firstweekday=calendar.SUNDAY)
+    calendar_html = cal.formatmonth(year, month)
+    return render(request, 'tasks/dashboard.html', {"user": user, "calendar_html": calendar_html})
 
 def profile(request):
     token = request.COOKIES.get("access_token")
@@ -145,3 +159,18 @@ def user_tasks_json(request):
     user_id = access_token["user_id"]
     tasks = Task.objects.filter(assigned_to=user_id).values("id", "title", "due_date", "completed")
     return JsonResponse(list(tasks), safe=False)
+
+
+## Calendar class to highlight current date
+class HighlightCalendar(calendar.HTMLCalendar):
+    def __init__(self, today, firstweekday=0):
+        super().__init__(firstweekday)
+        self.today = today
+
+    def formatday(self, day, weekday):
+        if day == 0:  # padding days
+            return '<td class="noday">&nbsp;</td>'
+        if day == self.today.day and self.today.month == self.today.month and self.today.year == self.today.year:
+            # Highlight today
+            return f'<td class="today bg-warning fw-bold">{day}</td>'
+        return f'<td class="{self.cssclasses[weekday]}">{day}</td>'

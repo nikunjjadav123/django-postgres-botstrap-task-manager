@@ -25,7 +25,7 @@ class TaskForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["username", "email","phone","profile_picture"]
+        fields = ["username", "email", "about", "phone", "profile_picture"]
         widgets = {
             "username": forms.TextInput(attrs={
                 "class": "form-control",
@@ -34,6 +34,11 @@ class ProfileForm(forms.ModelForm):
             "email": forms.EmailInput(attrs={
                 "class": "form-control",
                 "placeholder": "Enter email"
+            }),
+            "about": forms.Textarea(attrs={
+                "class": "form-control",
+                "rows": 3,
+                "style": "resize:none;"
             }),
             "phone": forms.TextInput(attrs={
                 "class": "form-control",

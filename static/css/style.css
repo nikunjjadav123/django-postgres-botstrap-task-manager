@@ -1,0 +1,22 @@
+
+.calendar .today {
+    background-color: #212529 !important; /* Bootstrap warning color */
+    border-radius: 50%;
+    color: #ffffff !important;
+}
+.calendar table {
+    width: 100%;
+    table-layout: fixed;
+}
+.calendar th, .calendar td {
+    text-align: center;
+    padding: 10px;
+}
+.calendar th {
+    background-color: #007bff;
+    color: white;
+}
+.calendar td {
+    background-color: #f8f9fa;
+}
+
