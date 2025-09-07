@@ -6,7 +6,9 @@ Users can add, update, and manage tasks with a clean and responsive interface.
 - Add, edit, and delete tasks  
 - Mark tasks as completed or pending  
 - Task listing with **Bootstrap tables** or **cards**
-- Secure configuration with `.env` file  
+- Secure configuration with `.env` file
+- Login / Change Password / Edit Profile
+- Login With JWT Token which access token will expire within 1 min and refresh token will activate upto 7 days
 
 ## Tech Stack
 
@@ -19,10 +21,12 @@ Users can add, update, and manage tasks with a clean and responsive interface.
 - **Streamlit:** 1.49.1
 ## Project Structure
 
-- django-postgres-bootstrap-task-manager/
-- ├── task_manager/       # Django project folder
-- ├── tasks/              # App for task management
-- ├── templates/          # HTML templates
-- ├── .env                # Environment variables
-- ├── requirements.txt    # Python dependencies
-- └── manage.py           # Django manage script
+- taskmanager_project/   ← main project folder
+- │── manage.py
+- │── taskmanager/       ← project config (settings, urls, wsgi, asgi)
+- │── accounts/
+- │── profiles/
+- │── tasks/
+- │── templates/
+- │── static/
+- │── db.sqlite3
