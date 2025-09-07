@@ -43,7 +43,7 @@
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'profile' %}">View Profile</a></li>
-                        <li><a class="dropdown-item" href="{% url 'profile_update' user.pk %}">Edit Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'profile_update' logged_user.pk %}">Edit Profile</a></li>
                         <li><a class="dropdown-item" href="{% url 'change_password' %}">Change Password</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li>

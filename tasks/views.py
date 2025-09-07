@@ -139,11 +139,11 @@ def profile(request):
     return render(request, "tasks/profile.html", {"user": user})   
 
 def update_profile(request, pk):
+
     token = request.COOKIES.get("access_token")
     access_token = AccessToken(token)
     user_id = access_token["user_id"]
     user = get_object_or_404(User, pk=user_id)
-
     if request.method == "POST":
         form = ProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
@@ -155,15 +155,16 @@ def update_profile(request, pk):
     return render(request, "tasks/profile_form.html", {"form": form})
 
 def change_password(request):
-    if not request.user.is_authenticated:
+
+    token = request.COOKIES.get("access_token")
+    access_token = AccessToken(token)
+    user_id = access_token["user_id"]
+    get_user = User.objects.get(id=user_id)
+    
+    if not get_user.is_authenticated:
         return redirect("login")
 
     if request.method == "POST":
-
-        token = request.COOKIES.get("access_token")
-        access_token = AccessToken(token)
-        user_id = access_token["user_id"]
-        get_user = User.objects.get(id=user_id)
       
         current_password = request.POST.get("current_password", "").strip()
         new_password = request.POST.get("new_password", "").strip()
